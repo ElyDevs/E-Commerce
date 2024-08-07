@@ -29,7 +29,7 @@ const AuthPage = () => {
             flex="1"
             align="stretch"
             spacing={6}
-            p={{ base: "none", md: 6 }} // Responsive padding
+            px={{ base: "none", md: 6 }} // Responsive padding
             display={"flex"}
             justifyContent={"center"}
           >

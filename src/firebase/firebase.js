@@ -4,13 +4,13 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCCu0zCOAO2qG7hhWtF1GgvgTQgpSFku3I",
-  authDomain: "e-commerce-elydevs.firebaseapp.com",
-  projectId: "e-commerce-elydevs",
-  storageBucket: "e-commerce-elydevs.appspot.com",
-  messagingSenderId: "287762501224",
-  appId: "1:287762501224:web:da68d02d684245232a75dd",
-  measurementId: "G-4ZCXSMMWSL",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);

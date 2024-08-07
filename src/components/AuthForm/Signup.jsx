@@ -1,12 +1,6 @@
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
-import {
-  Alert,
-  AlertIcon,
-  Button,
-  Input,
-  InputGroup,
-  InputRightElement,
-} from "@chakra-ui/react";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
+import { Button, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
 import { useState } from "react";
 
 const Signup = () => {
@@ -55,7 +49,11 @@ const Signup = () => {
             size={"sm"}
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? <ViewIcon /> : <ViewOffIcon />}
+            {showPassword ? (
+              <VisibilityRoundedIcon />
+            ) : (
+              <VisibilityOffRoundedIcon />
+            )}
           </Button>
         </InputRightElement>
       </InputGroup>
@@ -78,7 +76,11 @@ const Signup = () => {
             size={"sm"}
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
           >
-            {showConfirmPassword ? <ViewIcon /> : <ViewOffIcon />}
+            {showConfirmPassword ? (
+              <VisibilityRoundedIcon />
+            ) : (
+              <VisibilityOffRoundedIcon />
+            )}
           </Button>
         </InputRightElement>
       </InputGroup>

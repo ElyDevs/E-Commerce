@@ -4,6 +4,7 @@ import AuthPage from "./pages/AuthPage/AuthPage";
 import HomePage from "./pages/HomePage/HomePage";
 import { AuthContext } from "./contexts/AuthContext.jsx";
 import { useContext } from "react";
+import Navbar from "./components/Navigation/Navbar.jsx";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -16,6 +17,8 @@ function App() {
   return (
     <Box>
       <BrowserRouter>
+        {currentUser && <Navbar />}
+
         <Routes>
           <Route
             path="/"

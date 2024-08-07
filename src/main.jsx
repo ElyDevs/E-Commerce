@@ -4,7 +4,6 @@ import App from "./App.jsx";
 
 import { ChakraProvider } from "@chakra-ui/react";
 import { extendTheme } from "@chakra-ui/react";
-import { mode } from "@chakra-ui/theme-tools";
 
 import { AuthContextProvider } from "./contexts/AuthContext.jsx";
 
@@ -28,12 +27,12 @@ const colors = {
 const styles = {
   global: (props) => ({
     body: {
-      bg: mode("white", "gray.800")(props),
-      color: mode("gray.800", "whiteAlpha.900")(props),
+      bg: "white", // Always light background
+      color: "gray.800", // Always light text color
       lineHeight: "1.6",
     },
     a: {
-      color: mode("brand.600", "brand.300")(props),
+      color: "brand.600", // Always light link color
       _hover: {
         textDecoration: "underline",
       },
@@ -47,8 +46,8 @@ const styles = {
 };
 
 const config = {
-  initialColorMode: "light",
-  useSystemColorMode: false,
+  initialColorMode: "light", // Enforce light mode
+  useSystemColorMode: false, // Do not use system color mode
 };
 
 const theme = extendTheme({ config, styles, colors });
