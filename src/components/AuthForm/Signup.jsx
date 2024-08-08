@@ -54,12 +54,12 @@ const Signup = () => {
         email: inputs.email,
         role: "user",
         contact: {
-          phoneNumber: "",
-          address1: "",
-          address2: "",
+          phoneNumber: "-",
+          address1: "-",
+          address2: "-",
           country: "Tunisie",
-          city: "",
-          postalCode: "",
+          city: "-",
+          postalCode: "-",
         },
         createdAt: serverTimestamp(),
       });

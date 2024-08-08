@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Container,
+  Flex,
   Stack,
   Table,
   TableContainer,
@@ -12,16 +13,27 @@ import {
   Th,
   Thead,
   Tr,
+  useDisclosure,
 } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../contexts/AuthContext";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/Firebase";
+import LoadingUserProfile from "./LoadingUserProfile";
+import ChangeFullNameModal from "../../modals/ChangeFullNameModal";
+import ChangePhoneNumberModal from "../../modals/ChangePhoneNumberModal";
+import ChangeAddressModal from "../../modals/ChangeAddressModal";
+import ChangeCountryModal from "../../modals/ChangeCountryModal";
+import ChangeCityModal from "../../modals/ChangeCityModal";
+import ChangePostalCodeModal from "../../modals/ChangePostalCodeModal";
 
 const UserProfile = () => {
   const { currentUser } = useContext(AuthContext);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const [modalType, setModalType] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -48,12 +60,112 @@ const UserProfile = () => {
     }
   }, [currentUser]);
 
+  const handleSave = async (field, value) => {
+    try {
+      const userDocRef = doc(db, "users", currentUser.uid);
+      await updateDoc(userDocRef, { [field]: value });
+
+      // Update the local state with a new object reference
+      setUserData((prevData) => {
+        // Create a new object with updated field value
+        const updatedData = { ...prevData };
+        if (field.startsWith("contact.")) {
+          const contactField = field.split(".")[1];
+          updatedData.contact = {
+            ...updatedData.contact,
+            [contactField]: value,
+          };
+        } else {
+          updatedData[field] = value;
+        }
+        return updatedData;
+      });
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
+  };
+
+  const isInformationMissing = () => {
+    return (
+      userData?.fullName === "-" ||
+      userData?.contact?.phoneNumber === "-" ||
+      userData?.contact?.address1 === "-" ||
+      userData?.contact?.country === "-" ||
+      userData?.contact?.city === "-" ||
+      userData?.contact?.postalCode === "-"
+    );
+  };
+
   if (loading) {
-    return <Box>LOADING.......</Box>;
+    return <LoadingUserProfile />;
   }
 
   return (
     <Box>
+      <Box>
+        {modalType === "fullName" && (
+          <ChangeFullNameModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSave={(newFullName) => handleSave("fullName", newFullName)}
+            currentFullName={userData?.fullName || ""}
+          />
+        )}
+        {modalType === "phoneNumber" && (
+          <ChangePhoneNumberModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSave={(newPhoneNumber) =>
+              handleSave("contact.phoneNumber", newPhoneNumber)
+            }
+            currentPhoneNumber={userData?.contact.phoneNumber || ""}
+          />
+        )}
+        {modalType === "address1" && (
+          <ChangeAddressModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSave={(newAddress) => handleSave("contact.address1", newAddress)}
+            currentAddress={userData?.contact.address1 || ""}
+            addressType="Premiere Adresse"
+          />
+        )}
+        {modalType === "address2" && (
+          <ChangeAddressModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSave={(newAddress) => handleSave("contact.address2", newAddress)}
+            currentAddress={userData?.contact.address2 || ""}
+            addressType="Deuxieme Adresse"
+          />
+        )}
+        {modalType === "country" && (
+          <ChangeCountryModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSave={(newCountry) => handleSave("contact.country", newCountry)}
+            currentCountry={userData?.contact.country || ""}
+          />
+        )}
+        {modalType === "city" && (
+          <ChangeCityModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSave={(newCity) => handleSave("contact.city", newCity)}
+            currentCity={userData?.contact.city || ""}
+          />
+        )}
+        {modalType === "postalCode" && (
+          <ChangePostalCodeModal
+            isOpen={isOpen}
+            onClose={onClose}
+            onSave={(newPostalCode) =>
+              handleSave("contact.postalCode", newPostalCode)
+            }
+            currentPostalCode={userData?.contact.postalCode || ""}
+          />
+        )}
+      </Box>
       <Container my={10} maxW="50%">
         <Text fontSize={"5xl"}>Mon Compte</Text>
         <Stack spacing={10}>
@@ -65,51 +177,23 @@ const UserProfile = () => {
             <Table size={"lg"} variant="simple">
               <Thead>
                 <Tr>
-                  <Th colSpan={3}>Profile</Th>
+                  <Th colSpan={3}>Profil</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 <Tr>
-                  <Td>Full Name</Td>
-                  <Td>{userData?.fullName || ""}</Td>
-                  <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
-                    </Button>
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Email</Td>
+                  <Td>E-Mail</Td>
                   <Td>{userData?.email || ""}</Td>
-                  <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
-                    </Button>
-                  </Td>
                 </Tr>
                 <Tr>
-                  <Td>Password</Td>
+                  <Td>Mot De Passe</Td>
                   <Td>••••••••••••</Td>
-                  <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
-                    </Button>
-                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>Date D'insciption</Td>
+                  <Td> {userData?.createdAt?.toDate().toLocaleDateString()}</Td>
                 </Tr>
               </Tbody>
-              <Tfoot>
-                <Tr>
-                  <Th colSpan={2}>
-                    Member Since:{" "}
-                    {userData?.createdAt?.toDate().toLocaleDateString()}
-                  </Th>
-                  <Th isNumeric>
-                    <Button colorScheme="teal" variant="solid">
-                      Save
-                    </Button>{" "}
-                  </Th>
-                </Tr>
-              </Tfoot>
             </Table>
           </TableContainer>
 
@@ -121,34 +205,71 @@ const UserProfile = () => {
             <Table size={"lg"} variant="simple">
               <Thead>
                 <Tr>
-                  <Th colSpan={3}>Profile</Th>
+                  <Th colSpan={3}>Informations</Th>
                 </Tr>
               </Thead>
               <Tbody>
                 <Tr>
-                  <Td>Phone Number</Td>
+                  <Td>Nom Complet</Td>
+                  <Td>{userData?.fullName || ""}</Td>
+                  <Td isNumeric>
+                    <Button
+                      colorScheme="teal"
+                      variant="link"
+                      onClick={() => {
+                        setModalType("fullName");
+                        onOpen();
+                      }}
+                    >
+                      Modifier
+                    </Button>
+                  </Td>
+                </Tr>
+                <Tr>
+                  <Td>Numéro De Téléphone</Td>
                   <Td>{userData?.contact.phoneNumber || "-"}</Td>
                   <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
+                    <Button
+                      colorScheme="teal"
+                      variant="link"
+                      onClick={() => {
+                        setModalType("phoneNumber");
+                        onOpen();
+                      }}
+                    >
+                      Modifier
                     </Button>
                   </Td>
                 </Tr>
                 <Tr>
-                  <Td>Premiere Adresse</Td>
+                  <Td>Première Adresse</Td>
                   <Td>{userData?.contact.address1 || ""}</Td>
                   <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
+                    <Button
+                      colorScheme="teal"
+                      variant="link"
+                      onClick={() => {
+                        setModalType("address1");
+                        onOpen();
+                      }}
+                    >
+                      Modifier
                     </Button>
                   </Td>
                 </Tr>
                 <Tr>
-                  <Td>Deuxieme Adresse</Td>
+                  <Td>Deuxième Adresse</Td>
                   <Td>{userData?.contact.address2 || ""}</Td>
                   <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
+                    <Button
+                      colorScheme="teal"
+                      variant="link"
+                      onClick={() => {
+                        setModalType("address2");
+                        onOpen();
+                      }}
+                    >
+                      Modifier
                     </Button>
                   </Td>
                 </Tr>
@@ -156,8 +277,15 @@ const UserProfile = () => {
                   <Td>Pays</Td>
                   <Td>{userData?.contact.country || ""}</Td>
                   <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
+                    <Button
+                      colorScheme="teal"
+                      variant="link"
+                      onClick={() => {
+                        setModalType("country");
+                        onOpen();
+                      }}
+                    >
+                      Modifier
                     </Button>
                   </Td>
                 </Tr>
@@ -165,8 +293,15 @@ const UserProfile = () => {
                   <Td>Ville</Td>
                   <Td>{userData?.contact.city || ""}</Td>
                   <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
+                    <Button
+                      colorScheme="teal"
+                      variant="link"
+                      onClick={() => {
+                        setModalType("city");
+                        onOpen();
+                      }}
+                    >
+                      Modifier
                     </Button>
                   </Td>
                 </Tr>
@@ -174,23 +309,45 @@ const UserProfile = () => {
                   <Td>Code Postal</Td>
                   <Td>{userData?.contact.postalCode || ""}</Td>
                   <Td isNumeric>
-                    <Button colorScheme="teal" variant="link">
-                      Change
+                    <Button
+                      colorScheme="teal"
+                      variant="link"
+                      onClick={() => {
+                        setModalType("postalCode");
+                        onOpen();
+                      }}
+                    >
+                      Modifier
                     </Button>
                   </Td>
                 </Tr>
               </Tbody>
               <Tfoot>
-                <Tr>
-                  <Th colSpan={2}>
-                    Infomations are required for passing an order
-                  </Th>
-                  <Th isNumeric>
-                    <Button colorScheme="teal" variant="solid">
-                      Save
-                    </Button>{" "}
-                  </Th>
-                </Tr>
+                {isInformationMissing() ? (
+                  <Tr>
+                    <Td colSpan={3} color={"tomato"}>
+                      Complétez vos informations pour passer des commandes.
+                    </Td>
+                  </Tr>
+                ) : (
+                  <>
+                    <Td colSpan={3} color={"green.500"}>
+                      <Flex
+                        alignItems={"center"}
+                        justifyContent={"space-between"}
+                      >
+                        <Text>
+                          Votre profil est complet!
+                          <br />
+                          Vous pouvez maintenant passer des commandes.
+                        </Text>
+                        <Button colorScheme="teal" variant="solid">
+                          Commander
+                        </Button>
+                      </Flex>
+                    </Td>
+                  </>
+                )}
               </Tfoot>
             </Table>
           </TableContainer>
