@@ -1,7 +1,18 @@
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import VisibilityOffRoundedIcon from "@mui/icons-material/VisibilityOffRounded";
-import { Button, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
-import { useState } from "react";
+import {
+  Button,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Text,
+} from "@chakra-ui/react";
+import { useContext, useState } from "react";
+import { auth, db } from "../../firebase/Firebase.js";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
+import { collection, doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 const Signup = () => {
   const [inputs, setInputs] = useState({
@@ -12,11 +23,61 @@ const Signup = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  const navigate = useNavigate();
+  const { dispatch } = useContext(AuthContext);
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    if (inputs.password !== inputs.confirmPassword) {
+      setError(true);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        inputs.email,
+        inputs.password
+      );
+
+      const user = userCredential.user;
+
+      // Add user document to Firestore with a more structured format
+      await setDoc(doc(collection(db, "users"), user.uid), {
+        fullName: inputs.fullName,
+        email: inputs.email,
+        role: "user",
+        contact: {
+          phoneNumber: "",
+          address1: "",
+          address2: "",
+          country: "Tunisie",
+          city: "",
+          postalCode: "",
+        },
+        createdAt: serverTimestamp(),
+      });
+
+      dispatch({ type: "LOGIN", payload: user });
+      navigate("/");
+    } catch (error) {
+      setError(true);
+      console.error("Error during signup:", error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
       <Input
-        placeholder="Full Name"
+        placeholder="Nom complet"
         fontSize={14}
         type="text"
         size={"sm"}
@@ -25,7 +86,7 @@ const Signup = () => {
       />
 
       <Input
-        placeholder="Email"
+        placeholder="E-mail"
         fontSize={14}
         type="email"
         size={"sm"}
@@ -36,7 +97,7 @@ const Signup = () => {
       {/* Password */}
       <InputGroup>
         <Input
-          placeholder="Password"
+          placeholder="Mot de passe"
           fontSize={14}
           type={showPassword ? "text" : "password"}
           value={inputs.password}
@@ -61,7 +122,7 @@ const Signup = () => {
       {/* Confirm Password */}
       <InputGroup>
         <Input
-          placeholder="Confirm Password"
+          placeholder="Confirmer le mot de passe"
           fontSize={14}
           type={showConfirmPassword ? "text" : "password"}
           value={inputs.confirmPassword}
@@ -84,9 +145,22 @@ const Signup = () => {
           </Button>
         </InputRightElement>
       </InputGroup>
-      <Button w={"full"} colorScheme="blue" size={"sm"} fontSize={14}>
-        Sign Up
+      <Button
+        onClick={handleSignup}
+        isLoading={loading}
+        w={"full"}
+        colorScheme="blue"
+        size={"sm"}
+        fontSize={14}
+      >
+        S'inscrire
       </Button>
+
+      {error && (
+        <Text fontSize={"xs"} color={"tomato"}>
+          Les mots de passe ne correspondent pas !
+        </Text>
+      )}
     </>
   );
 };

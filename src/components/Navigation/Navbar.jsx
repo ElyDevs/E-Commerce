@@ -33,15 +33,33 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
 import PhoneRoundedIcon from "@mui/icons-material/LocalPhoneRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import { useContext } from "react";
+import { AuthContext } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const { dispatch } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch({ type: "LOGOUT" });
+  };
+
   return (
     <Box h={"15vh"} shadow={"md"}>
       <Flex h="100%" direction="column">
         <Flex h={"60%"} alignItems={"center"} justifyContent={"space-around"}>
           {/* 1 */}
           <Flex w={"33%"} alignItems={"center"} justifyContent={"center"}>
-            <Image h={100} src="/YourLogoHere.png" objectFit="contain" />
+            <Image
+              h={100}
+              src="/YourLogoHere.png"
+              objectFit="contain"
+              cursor={"pointer"}
+              onClick={() => {
+                navigate("/");
+              }}
+            />
           </Flex>
 
           {/* 2 */}
@@ -75,10 +93,16 @@ const Navbar = () => {
                 />
                 <MenuList>
                   <MenuGroup title="Profil">
-                    <MenuItem>Mon Profil</MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        navigate("/profile");
+                      }}
+                    >
+                      Mon Compte
+                    </MenuItem>
                     <MenuItem>Mes Commandes</MenuItem>
                     <MenuDivider />
-                    <MenuItem>Déconnexion</MenuItem>
+                    <MenuItem onClick={handleLogout}>Déconnexion</MenuItem>
                   </MenuGroup>
                 </MenuList>
               </Menu>

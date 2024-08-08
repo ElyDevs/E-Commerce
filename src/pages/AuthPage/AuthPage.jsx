@@ -8,7 +8,7 @@ const AuthPage = () => {
       <Container
         maxW="container.md"
         border="1px solid gray"
-        borderRadius="md"
+        borderRadius={6}
         boxShadow="md" // Added shadow for a lifted effect
         p={6} // Added padding inside the container
       >
@@ -19,7 +19,6 @@ const AuthPage = () => {
             flex="1"
             h="640px"
             maxW="360px"
-            // 16:9 ASPECT RATIO TO TELL IN THE DASHBOARD YOU KNOW PLEASE DONT FORGET
           >
             <ImageSlider /> {/* Use the ImageSlider component */}
           </Box>

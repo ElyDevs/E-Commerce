@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import { AuthContext } from "./contexts/AuthContext.jsx";
 import { useContext } from "react";
 import Navbar from "./components/Navigation/Navbar.jsx";
+import UserProfile from "./pages/ProfilePage/UserProfile.jsx";
 
 function App() {
   const { currentUser } = useContext(AuthContext);
@@ -12,6 +13,10 @@ function App() {
 
   const RequireAuth = ({ children }) => {
     return currentUser ? children : <Navigate to="/connection" />;
+  };
+
+  const RequireNoAuth = ({ children }) => {
+    return !currentUser ? children : <Navigate to="/" />;
   };
 
   return (
@@ -28,7 +33,22 @@ function App() {
               </RequireAuth>
             }
           />
-          <Route path="/connection" element={<AuthPage />} />
+          <Route
+            path="/connection"
+            element={
+              <RequireNoAuth>
+                <AuthPage />
+              </RequireNoAuth>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
+                <UserProfile />
+              </RequireAuth>
+            }
+          />
           <Route path="*" element={<Navigate to="/" />} />{" "}
           {/* Redirects unknown paths to the homepage */}
         </Routes>

@@ -8,39 +8,43 @@ import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 const Login = () => {
   const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [inputs, setInputs] = useState({
     email: "",
     password: "",
   });
 
   const navigate = useNavigate();
-
   const { dispatch } = useContext(AuthContext);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    signInWithEmailAndPassword(auth, inputs.email, inputs.password)
-      .then((userCredential) => {
-        // Signed up
-        const user = userCredential.user;
-        dispatch({ type: "LOGIN", payload: user });
-        navigate("/");
-        // ...
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
-        setError(true);
-        console.error("Login error:", errorCode, errorMessage); // TO REMOVE BABY
-      });
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        inputs.email,
+        inputs.password
+      );
+
+      const user = userCredential.user;
+
+      dispatch({ type: "LOGIN", payload: user });
+      navigate("/");
+    } catch (error) {
+      console.error("Error during login:", error.message);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       <Input
-        placeholder="Email"
+        placeholder="E-mail"
         fontSize={14}
         type="email"
         size={"sm"}
@@ -48,7 +52,7 @@ const Login = () => {
         onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
       />
       <Input
-        placeholder="Password"
+        placeholder="Mot de passe"
         fontSize={14}
         size={"sm"}
         type="password"
@@ -58,15 +62,20 @@ const Login = () => {
 
       <Button
         onClick={handleLogin}
+        isLoading={loading}
         w={"full"}
         colorScheme="blue"
         size={"sm"}
         fontSize={14}
       >
-        Log in
+        Se Connecter
       </Button>
 
-      {error && <Text color={"tomato"}>Wrong email or password!</Text>}
+      {error && (
+        <Text fontSize={"xs"} color={"tomato"}>
+          Adresse e-mail ou mot de passe incorrect !
+        </Text>
+      )}
     </>
   );
 };
