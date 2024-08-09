@@ -13,6 +13,7 @@ import {
   Th,
   Thead,
   Tr,
+  useBreakpointValue,
   useDisclosure,
 } from "@chakra-ui/react";
 import React, { useContext, useEffect, useState } from "react";
@@ -85,6 +86,14 @@ const UserProfile = () => {
     }
   };
 
+  const capitalizeWords = (str) => {
+    return str
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   const isInformationMissing = () => {
     return (
       userData?.fullName === "-" ||
@@ -95,6 +104,13 @@ const UserProfile = () => {
       userData?.contact?.postalCode === "-"
     );
   };
+
+  const isTableLayout = useBreakpointValue({
+    base: false,
+    md: false,
+    lg: true,
+    xl: true,
+  });
 
   if (loading) {
     return <LoadingUserProfile />;
@@ -166,7 +182,10 @@ const UserProfile = () => {
           />
         )}
       </Box>
-      <Container my={10} maxW="50%">
+      <Container
+        my={10}
+        maxW={{ base: "100%", md: "100%", lg: "75%", xl: "50%" }}
+      >
         <Text fontSize={"5xl"}>Mon Compte</Text>
         <Stack spacing={10}>
           <TableContainer
@@ -174,27 +193,68 @@ const UserProfile = () => {
             shadow={"md"}
             borderRadius={10}
           >
-            <Table size={"lg"} variant="simple">
-              <Thead>
-                <Tr>
-                  <Th colSpan={3}>Profil</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td>E-Mail</Td>
-                  <Td>{userData?.email || ""}</Td>
-                </Tr>
-                <Tr>
-                  <Td>Mot De Passe</Td>
-                  <Td>••••••••••••</Td>
-                </Tr>
-                <Tr>
-                  <Td>Date D'insciption</Td>
-                  <Td> {userData?.createdAt?.toDate().toLocaleDateString()}</Td>
-                </Tr>
-              </Tbody>
-            </Table>
+            {isTableLayout ? (
+              <Table size={{ base: "sm", md: "md", lg: "lg" }} variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th colSpan={3}>Profil</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td>E-Mail :</Td>
+                    <Td>{userData?.email || "Not Found"}</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Mot De Passe :</Td>
+                    <Td>••••••••••••</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Date D'insciption :</Td>
+                    <Td>
+                      {userData?.createdAt?.toDate().toLocaleDateString()}
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            ) : (
+              // BASE & MD
+              <Box>
+                <Table
+                  size={{ base: "sm", md: "md", lg: "lg" }}
+                  variant="simple"
+                >
+                  <Thead>
+                    <Tr>
+                      <Th colSpan={3}>Profil</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    <Tr>
+                      <Td>
+                        <Text as={"sup"}>E-Mail :</Text>
+                        <br />
+                        {userData?.email || "Not Found"}
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>
+                        <Text as={"sup"}>Mot De Passe :</Text>
+                        <br />
+                        ••••••••••••
+                      </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>
+                        <Text as={"sup"}>Date D'insciption :</Text>
+                        <br />
+                        {userData?.createdAt?.toDate().toLocaleDateString()}
+                      </Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </Box>
+            )}
           </TableContainer>
 
           <TableContainer
@@ -202,154 +262,386 @@ const UserProfile = () => {
             shadow={"md"}
             borderRadius={10}
           >
-            <Table size={"lg"} variant="simple">
-              <Thead>
-                <Tr>
-                  <Th colSpan={3}>Informations</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr>
-                  <Td>Nom Complet</Td>
-                  <Td>{userData?.fullName || ""}</Td>
-                  <Td isNumeric>
-                    <Button
-                      colorScheme="teal"
-                      variant="link"
-                      onClick={() => {
-                        setModalType("fullName");
-                        onOpen();
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Numéro De Téléphone</Td>
-                  <Td>{userData?.contact.phoneNumber || "-"}</Td>
-                  <Td isNumeric>
-                    <Button
-                      colorScheme="teal"
-                      variant="link"
-                      onClick={() => {
-                        setModalType("phoneNumber");
-                        onOpen();
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Première Adresse</Td>
-                  <Td>{userData?.contact.address1 || ""}</Td>
-                  <Td isNumeric>
-                    <Button
-                      colorScheme="teal"
-                      variant="link"
-                      onClick={() => {
-                        setModalType("address1");
-                        onOpen();
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Deuxième Adresse</Td>
-                  <Td>{userData?.contact.address2 || ""}</Td>
-                  <Td isNumeric>
-                    <Button
-                      colorScheme="teal"
-                      variant="link"
-                      onClick={() => {
-                        setModalType("address2");
-                        onOpen();
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Pays</Td>
-                  <Td>{userData?.contact.country || ""}</Td>
-                  <Td isNumeric>
-                    <Button
-                      colorScheme="teal"
-                      variant="link"
-                      onClick={() => {
-                        setModalType("country");
-                        onOpen();
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Ville</Td>
-                  <Td>{userData?.contact.city || ""}</Td>
-                  <Td isNumeric>
-                    <Button
-                      colorScheme="teal"
-                      variant="link"
-                      onClick={() => {
-                        setModalType("city");
-                        onOpen();
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                  </Td>
-                </Tr>
-                <Tr>
-                  <Td>Code Postal</Td>
-                  <Td>{userData?.contact.postalCode || ""}</Td>
-                  <Td isNumeric>
-                    <Button
-                      colorScheme="teal"
-                      variant="link"
-                      onClick={() => {
-                        setModalType("postalCode");
-                        onOpen();
-                      }}
-                    >
-                      Modifier
-                    </Button>
-                  </Td>
-                </Tr>
-              </Tbody>
-              <Tfoot>
-                {isInformationMissing() ? (
+            {isTableLayout ? (
+              <Table size={{ base: "sm", md: "md", lg: "lg" }} variant="simple">
+                <Thead>
                   <Tr>
-                    <Td colSpan={3} color={"tomato"}>
-                      Complétez vos informations pour passer des commandes.
+                    <Th colSpan={3}>Informations</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td>Nom Complet *</Td>
+                    <Td>
+                      {userData?.fullName
+                        ? capitalizeWords(userData.fullName)
+                        : "Not Found"}
+                    </Td>
+                    <Td>
+                      <Button
+                        color="teal"
+                        variant="link"
+                        onClick={() => {
+                          setModalType("fullName");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
                     </Td>
                   </Tr>
-                ) : (
-                  <>
-                    <Td colSpan={3} color={"green.500"}>
-                      <Flex
-                        alignItems={"center"}
-                        justifyContent={"space-between"}
+                  <Tr>
+                    <Td>Numéro De Téléphone *</Td>
+                    <Td>{userData?.contact.phoneNumber || "Not Found"}</Td>
+                    <Td>
+                      <Button
+                        color={
+                          userData?.contact.phoneNumber === "-"
+                            ? "tomato"
+                            : "teal"
+                        }
+                        variant="link"
+                        onClick={() => {
+                          setModalType("phoneNumber");
+                          onOpen();
+                        }}
                       >
-                        <Text>
-                          Votre profil est complet!
-                          <br />
-                          Vous pouvez maintenant passer des commandes.
-                        </Text>
-                        <Button colorScheme="teal" variant="solid">
-                          Commander
-                        </Button>
-                      </Flex>
+                        Modifier
+                      </Button>
                     </Td>
-                  </>
-                )}
-              </Tfoot>
-            </Table>
+                  </Tr>
+                  <Tr>
+                    <Td>
+                      Première Adresse *
+                      <br />
+                    </Td>
+                    <Td>{userData?.contact.address1 || "Not Found"}</Td>
+                    <Td>
+                      <Button
+                        color={
+                          userData?.contact.address1 === "-" ? "tomato" : "teal"
+                        }
+                        variant="link"
+                        onClick={() => {
+                          setModalType("address1");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>
+                      Deuxième Adresse
+                      <br />
+                    </Td>
+                    <Td>{userData?.contact.address2 || "Not Found"}</Td>
+                    <Td>
+                      <Button
+                        color="teal"
+                        variant="link"
+                        onClick={() => {
+                          setModalType("address2");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Pays *</Td>
+                    <Td>{userData?.contact.country || "Not Found"}</Td>
+                    <Td>
+                      <Button
+                        color="teal"
+                        variant="link"
+                        onClick={() => {
+                          setModalType("country");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Ville *</Td>
+                    <Td>{userData?.contact.city || "Not Found"}</Td>
+                    <Td>
+                      <Button
+                        color={
+                          userData?.contact.city === "-" ? "tomato" : "teal"
+                        }
+                        variant="link"
+                        onClick={() => {
+                          setModalType("city");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Code Postal *</Td>
+                    <Td>{userData?.contact.postalCode || "Not Found"}</Td>
+                    <Td>
+                      <Button
+                        color={
+                          userData?.contact.postalCode === "-"
+                            ? "tomato"
+                            : "teal"
+                        }
+                        variant="link"
+                        onClick={() => {
+                          setModalType("postalCode");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                </Tbody>
+                <Tfoot>
+                  {isInformationMissing() ? (
+                    <Tr>
+                      <Td colSpan={3} color={"tomato"}>
+                        <Text>
+                          Complétez vos informations pour passer des commandes.
+                        </Text>
+                      </Td>
+                    </Tr>
+                  ) : (
+                    <>
+                      <Td colSpan={3} color={"green"}>
+                        <Box
+                          display={"flex"}
+                          flexDirection={"row"}
+                          gap={5}
+                          alignItems={"center"}
+                          justifyContent={"space-between"}
+                        >
+                          <Text>
+                            Votre profil est complet!
+                            <br />
+                            Vous pouvez maintenant passer des commandes.
+                          </Text>
+                          <Button colorScheme="teal" variant="solid">
+                            Commander
+                          </Button>
+                        </Box>
+                      </Td>
+                    </>
+                  )}
+                </Tfoot>
+              </Table>
+            ) : (
+              // BASE & MD
+              <Table size={{ base: "sm", md: "md", lg: "lg" }} variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th colSpan={3}>Informations</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td>
+                      <Text as={"sup"}>Nom Complet *</Text>
+                      <br />
+                      {userData?.fullName
+                        ? capitalizeWords(userData.fullName)
+                        : "Not Found"}
+                    </Td>
+                    <Td isNumeric>
+                      <Button
+                        size={"xs"}
+                        color="teal"
+                        variant="link"
+                        onClick={() => {
+                          setModalType("fullName");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>
+                      <Text as={"sup"}>Numéro De Téléphone *</Text>
+                      <br />
+                      {userData?.contact.phoneNumber || "Not Found"}
+                    </Td>
+                    <Td isNumeric>
+                      <Button
+                        size={"xs"}
+                        color={
+                          userData?.contact.phoneNumber === "-"
+                            ? "tomato"
+                            : "teal"
+                        }
+                        variant="link"
+                        onClick={() => {
+                          setModalType("phoneNumber");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>
+                      <Text as={"sup"}>Première Adresse *</Text>
+                      <br />
+                      {userData?.contact.address1 || "Not Found"}
+                    </Td>
+                    <Td isNumeric>
+                      <Button
+                        size={"xs"}
+                        color={
+                          userData?.contact.address1 === "-" ? "tomato" : "teal"
+                        }
+                        variant="link"
+                        onClick={() => {
+                          setModalType("address1");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>
+                      <Text as={"sup"}>Deuxième Adresse</Text>
+                      <br />
+                      {userData?.contact.address2 || "Not Found"}
+                    </Td>
+                    <Td isNumeric>
+                      <Button
+                        size={"xs"}
+                        color="teal"
+                        variant="link"
+                        onClick={() => {
+                          setModalType("address2");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>
+                      <Text as={"sup"}>Pays *</Text>
+                      <br />
+                      {userData?.contact.country || "Not Found"}
+                    </Td>
+                    <Td isNumeric>
+                      <Button
+                        size={"xs"}
+                        color="teal"
+                        variant="link"
+                        onClick={() => {
+                          setModalType("country");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>
+                      <Text as={"sup"}>Ville *</Text>
+                      <br />
+                      {userData?.contact.city || "Not Found"}
+                    </Td>
+                    <Td isNumeric>
+                      <Button
+                        size={"xs"}
+                        color={
+                          userData?.contact.city === "-" ? "tomato" : "teal"
+                        }
+                        variant="link"
+                        onClick={() => {
+                          setModalType("city");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>
+                      <Text as={"sup"}>Code Postal *</Text>
+                      <br />
+                      {userData?.contact.postalCode || "Not Found"}
+                    </Td>
+                    <Td isNumeric>
+                      <Button
+                        size={"xs"}
+                        color={
+                          userData?.contact.postalCode === "-"
+                            ? "tomato"
+                            : "teal"
+                        }
+                        variant="link"
+                        onClick={() => {
+                          setModalType("postalCode");
+                          onOpen();
+                        }}
+                      >
+                        Modifier
+                      </Button>
+                    </Td>
+                  </Tr>
+                </Tbody>
+                <Tfoot>
+                  {isInformationMissing() ? (
+                    <Tr>
+                      <Td colSpan={3} color={"tomato"}>
+                        <Text fontSize={"xs"}>
+                          Complétez vos informations pour passer des commandes.
+                        </Text>
+                      </Td>
+                    </Tr>
+                  ) : (
+                    <>
+                      <Tr>
+                        <Td colSpan={3} color={"green"}>
+                          <Box
+                            display={"flex"}
+                            flexDirection={"column"}
+                            gap={5}
+                            alignItems={"flex-start"}
+                            justifyContent={"space-between"}
+                          >
+                            <Text fontSize={"xs"}>
+                              Votre profil est complet!
+                              <br />
+                              Vous pouvez maintenant passer des commandes.
+                            </Text>
+                            <Button
+                              size={"sm"}
+                              colorScheme="teal"
+                              variant="solid"
+                            >
+                              Commander
+                            </Button>
+                          </Box>
+                        </Td>
+                      </Tr>
+                    </>
+                  )}
+                </Tfoot>
+              </Table>
+            )}
           </TableContainer>
         </Stack>
       </Container>

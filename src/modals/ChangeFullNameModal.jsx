@@ -24,7 +24,12 @@ const ChangeFullNameModal = ({ isOpen, onClose, onSave, currentFullName }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered>
+    <Modal
+      size={{ base: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl" }}
+      isCentered
+      isOpen={isOpen}
+      onClose={onClose}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Changer Le Nom Complet</ModalHeader>

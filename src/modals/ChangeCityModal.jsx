@@ -7,30 +7,75 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  Input,
+  Select,
 } from "@chakra-ui/react";
 import { useState } from "react";
 
+// List of Tunisian cities
+const tunisianCities = [
+  "Tunis",
+  "Sfax",
+  "Sousse",
+  "Kairouan",
+  "Bizerte",
+  "Medenine",
+  "Gabès",
+  "Sidi Bouzid",
+  "Kasserine",
+  "Nabeul",
+  "Jendouba",
+  "Siliana",
+  "Zaghouan",
+  "La Manouba",
+  "Ariana",
+  "Ben Arous",
+  "Gafsa",
+  "El Kef",
+  "Tataouine",
+  "Tozeur",
+  "Kebili",
+  "Béja",
+  "Monastir",
+  "Mahdia",
+];
+
 const ChangeCityModal = ({ isOpen, onClose, onSave, currentCity }) => {
-  const [newCity, setNewCity] = useState(currentCity);
+  const [selectedCity, setSelectedCity] = useState(currentCity);
 
   const handleSave = () => {
-    if (newCity.trim() === "") {
+    if (selectedCity.trim() === "") {
       // Optionally, show an error message or feedback
       return;
     }
-    onSave(newCity);
+    onSave(selectedCity);
     onClose();
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal
+      size={{ base: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl" }}
+      isCentered
+      isOpen={isOpen}
+      onClose={onClose}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Change City</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Input value={newCity} onChange={(e) => setNewCity(e.target.value)} />
+          <Select
+            value={selectedCity}
+            onChange={(e) => setSelectedCity(e.target.value)}
+          >
+            <option value="" disabled>
+              Select a city
+            </option>
+            {tunisianCities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </Select>
         </ModalBody>
 
         <ModalFooter>
@@ -38,7 +83,7 @@ const ChangeCityModal = ({ isOpen, onClose, onSave, currentCity }) => {
             colorScheme="blue"
             mr={3}
             onClick={handleSave}
-            isDisabled={newCity.trim() === "" || newCity === "-"}
+            isDisabled={selectedCity.trim() === ""}
           >
             Sauvegarder
           </Button>

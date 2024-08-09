@@ -29,7 +29,12 @@ const ChangePostalCodeModal = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal
+      size={{ base: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl" }}
+      isCentered
+      isOpen={isOpen}
+      onClose={onClose}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Modifier Le Code Postal</ModalHeader>

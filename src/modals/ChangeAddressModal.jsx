@@ -30,7 +30,12 @@ const ChangeAddressModal = ({
   };
 
   return (
-    <Modal isCentered isOpen={isOpen} onClose={onClose}>
+    <Modal
+      size={{ base: "xs", sm: "sm", md: "md", lg: "lg", xl: "xl" }}
+      isCentered
+      isOpen={isOpen}
+      onClose={onClose}
+    >
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Modifier La {addressType}</ModalHeader>
